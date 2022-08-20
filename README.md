@@ -1,20 +1,47 @@
 # `gcc-riscv-docker`: a container image for compiling RISC-V 64
 
-This repository contains a `Dockerfile` which builds a container image based on `ubuntu:latest` and installs the gcc-crosscompiler for RISC-V 64. 
+This repository contains a toolchain for building and running containers (i.e. with Docker or Podman) in order to compile and run RISC-V 64 in the container.
 
 ## Usage
 
-The script is built with `podman` in mind, but should work just as well with `Docker`. To change this, adjust the comments in the files.
+### Building the container
+The whole thing is built with `make`.
 
+If you want to use Docker instead of Podman, adjust `BUILDER` in the `Makefile`.
 
 ```bash
-# make scripts executable
-chmod u+x build.sh
-chmod u+x compile.sh
+# build the image
+make build
 
-# build the container
-./build.sh
+# build the image without using cached results
+make nocache
 
-# compile the file
-./compile.sh main.c -o main.o
+# export the image to gcc-riscv-docker.tar
+make save
+
+# delete the .tar
+make clean
+```
+
+### Using the container
+
+An exemplary usage is in `./example`, and there is a separate `Makefile`.
+
+If you want to use Docker instead of Podman, adjust `RUNNER` in the `Makefile`.
+
+To adjust which files are built, change `COMPILE_FILES` and `COMPILE_OUT` in the `Makefile` accordingly.
+
+```bash
+cd example
+
+# compile main.c to main.o
+make compile
+
+# run main.o with spike and a proxy-kernel (pk)
+make run
+
+# just start a container and connect a shell (for inspection etc.)
+# ATTN: The container is deleted, only the contents of the outside
+# local directory will be kept
+make login
 ```
